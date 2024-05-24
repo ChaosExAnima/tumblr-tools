@@ -1,0 +1,38 @@
+{
+  "name": "tumblr-tools",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "esbuild entry/*.ts --bundle --platform=node --outdir=build",
+    "watch": "pnpm run build --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "dotenv": "^16.4.5",
+    "esbuild": "^0.21.1",
+    "glob": "^10.4.1",
+    "meilisearch": "^0.40.0",
+    "minimist": "^1.2.8",
+    "p-ratelimit": "^1.0.1",
+    "tumblr.js": "^5.0.0"
+  },
+  "volta": {
+    "node": "22.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.3.0",
+    "@types/minimist": "^1.2.5",
+    "@types/node": "^20.12.11",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-perfectionist": "^2.10.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.10.0"
+  }
+}
