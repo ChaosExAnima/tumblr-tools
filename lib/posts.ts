@@ -6,8 +6,8 @@ import type { Post } from './types';
 
 import { POSTS_FOLDER } from './constants';
 
-export async function loadPosts(): Promise<Post[]> {
-	const files = await glob(`${POSTS_FOLDER}/**/*.json`);
+export async function loadPosts(blogName: string): Promise<Post[]> {
+	const files = await glob(`${POSTS_FOLDER}/${blogName}/**/*.json`);
 	return Promise.all(
 		files.map((file) =>
 			readFile(file, 'utf8').then((file) => JSON.parse(file)),

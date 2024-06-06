@@ -1,11 +1,11 @@
 import fs from 'fs/promises';
-import minimist from 'minimist';
 import path from 'path';
 
 import type { BlogPostsResponse, Post } from '../lib/types';
 
+import { blogNameFromArgs } from '../lib/helpers';
 import { debug } from '../lib/logging';
-import { postPath } from '../lib/posts';
+import { loadPosts, postPath } from '../lib/posts';
 import {
 	BLOG_POSTS_LIMIT,
 	Client,
@@ -31,27 +31,61 @@ async function saveToFile(post: Post) {
 }
 
 async function fetchPosts(client: Client, blogName: string, offset: number) {
-	debug('Requesting tags with offset:', offset * BLOG_POSTS_LIMIT);
+	debug('Requesting posts with offset:', offset * BLOG_POSTS_LIMIT);
 	const response = (await client.blogPosts(blogName, {
 		offset: offset * BLOG_POSTS_LIMIT,
 	})) as BlogPostsResponse;
-	await Promise.all(response.posts.map(saveToFile));
+	return response.posts;
+}
+
+const limit = throttle();
+
+async function* postGenerator(
+	client: Client,
+	blogName: string,
+	latestTimestamp: number,
+) {
+	let foundLatest = false;
+	let pageNumber = 0;
+	do {
+		const posts = await limit(() =>
+			fetchPosts(client, blogName, pageNumber),
+		);
+		debug(
+			'Fetched batch of',
+			posts.length,
+			'posts with offset:',
+			pageNumber,
+		);
+		for (const post of posts) {
+			if (post.timestamp <= latestTimestamp) {
+				foundLatest = true;
+				break;
+			}
+			yield post;
+		}
+		pageNumber++;
+	} while (!foundLatest);
 }
 
 async function main() {
-	const args = minimist(process.argv.slice(2));
+	const blogName = blogNameFromArgs();
 	const client = tumblrClient();
-	const blogName = args._[0];
-	const info = await client.blogInfo(blogName);
-	const requestCount = Math.ceil(info.blog.total_posts / BLOG_POSTS_LIMIT);
-	debug('Request count:', requestCount);
-	const limit = throttle();
-	// await fetchPosts(client, blogName, 0);
-	await Promise.all(
-		[...Array(requestCount).keys()].map((index) =>
-			limit(() => fetchPosts(client, blogName, index)),
-		),
+	const currentPosts = await loadPosts(blogName);
+	const latestTimestamp = currentPosts.reduce(
+		(max, post) => Math.max(max, post.timestamp),
+		0,
 	);
+	let downloadedPosts = 0;
+	for await (const post of postGenerator(client, blogName, latestTimestamp)) {
+		await saveToFile(post);
+		downloadedPosts++;
+	}
+	if (downloadedPosts > 0) {
+		console.log('Done! Downloaded', downloadedPosts, 'posts');
+	} else {
+		console.log('No new posts found!');
+	}
 }
 
 main();

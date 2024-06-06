@@ -1,4 +1,6 @@
-export function chunk<Type extends any>(
+import minimist from 'minimist';
+
+export function chunk<Type>(
 	arr: Type[],
 	chunkSize = 1,
 	cache: Type[][] = [],
@@ -11,6 +13,10 @@ export function chunk<Type extends any>(
 	return cache;
 }
 
-async function sleep(ms: number) {
-	return new Promise((resolve) => setTimeout(resolve, ms));
+export function blogNameFromArgs(): string {
+	const args = minimist(process.argv.slice(2));
+	if (args._.length === 0) {
+		throw new Error('Blog name is not set');
+	}
+	return args._[0];
 }
