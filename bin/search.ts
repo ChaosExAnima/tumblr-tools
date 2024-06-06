@@ -1,3 +1,5 @@
+#!/usr/bin/env -S pnpm tsx
+
 import 'dotenv/config';
 import MeiliSearch from 'meilisearch';
 import minimist from 'minimist';

@@ -1,3 +1,5 @@
+#!/usr/bin/env -S pnpm tsx
+
 import fs from 'fs/promises';
 import path from 'path';
 

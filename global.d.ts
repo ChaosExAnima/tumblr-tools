@@ -3,6 +3,7 @@ export {};
 declare global {
 	namespace NodeJS {
 		interface ProcessEnv {
+			MEILISEARCH_HOST?: string;
 			MEILISEARCH_KEY: string;
 			TUMBLR_KEY: string;
 			TUMBLR_SECRET: string;

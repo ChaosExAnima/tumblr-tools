@@ -1,6 +1,6 @@
-import { createClient } from 'tumblr.js';
-import { pRateLimit } from 'p-ratelimit';
 import 'dotenv/config';
+import { pRateLimit } from 'p-ratelimit';
+import { createClient } from 'tumblr.js';
 
 import type { Client } from '../node_modules/tumblr.js/types/tumblr.d.ts';
 
@@ -11,8 +11,8 @@ export const BLOG_POSTS_LIMIT = 20;
 export function throttle() {
 	return pRateLimit({
 		interval: 1000,
-		rate: 250, // 300, but keeping it conservative.
 		maxDelay: 2000,
+		rate: 250, // 300, but keeping it conservative.
 	});
 }
 

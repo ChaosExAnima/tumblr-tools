@@ -1,13 +1,11 @@
-import MeiliSearch from 'meilisearch';
+#!/usr/bin/env -S pnpm tsx
 
 import { blogNameFromArgs, chunk } from '../lib/helpers';
 import { loadPosts, postImagePaths } from '../lib/posts';
+import { searchClient } from '../lib/search';
 
 async function main() {
-	const client = new MeiliSearch({
-		apiKey: 'iD6XOfiDGF__C-kzdjsQp9xKS2n6lYCeqO9O0q1a2NU',
-		host: 'http://localhost:7700',
-	});
+	const client = searchClient();
 	const blogName = blogNameFromArgs();
 	const posts = await loadPosts(blogName);
 	const chunks = chunk(posts, 100);

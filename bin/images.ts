@@ -1,7 +1,10 @@
+#!/usr/bin/env -S pnpm tsx
+
 import { access, mkdir, writeFile } from 'fs/promises';
 import minimist from 'minimist';
 import { join } from 'path';
 
+import { blogNameFromArgs } from '../lib/helpers';
 import { debug } from '../lib/logging';
 import { loadPosts, postPath } from '../lib/posts';
 import { Image, Post } from '../lib/types';
@@ -68,7 +71,8 @@ async function downloadImage(path: string, image: Image) {
 }
 
 async function main() {
-	const posts = await loadPosts();
+	const blogName = blogNameFromArgs();
+	const posts = await loadPosts(blogName);
 	Promise.all(posts.map(findImagesToDownload));
 }
 
