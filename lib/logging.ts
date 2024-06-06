@@ -9,7 +9,9 @@ export function isVerbose() {
 export function debug(...args: unknown[]) {
 	if (isVerbose()) {
 		const string = args
-			.map((arg) => (typeof arg === 'string' ? arg : JSON.stringify(arg)))
+			.map((arg) =>
+				typeof arg === 'string' ? arg : JSON.stringify(arg, null, 2),
+			)
 			.join(' ');
 		console.log(colors.dim(string));
 	}

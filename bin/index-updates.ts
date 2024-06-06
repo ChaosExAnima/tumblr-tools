@@ -7,12 +7,20 @@ type PostKeys = keyof IndexedPost;
 
 async function main() {
 	const index = searchClient();
-	await Promise.allSettled([
+	const results = await Promise.allSettled([
 		index.updateFaceting({
 			sortFacetValuesBy: {
 				tags: 'count',
 			},
 		}),
+		index.updateRankingRules([
+			'words',
+			'typo',
+			'sort',
+			'proximity',
+			'attribute',
+			'exactness',
+		]),
 		index.updateFilterableAttributes([
 			'is_reblog',
 			'state',
@@ -43,7 +51,11 @@ async function main() {
 			'type',
 		] as PostKeys[]),
 	]);
-	console.log('Updated index settings');
+	const failed = results.filter((result) => result.status === 'rejected');
+	if (failed.length > 0) {
+		console.error('Some updates failed:', failed);
+	}
+	console.log('Updated index settings!');
 }
 
 main();

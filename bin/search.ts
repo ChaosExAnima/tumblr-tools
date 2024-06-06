@@ -3,10 +3,11 @@
 import 'dotenv/config';
 import minimist from 'minimist';
 
+import { debug, isVerbose } from '../lib/logging';
 import { searchClient } from '../lib/search';
 
 async function main() {
-	const args = minimist(process.argv.slice(2));
+	const args = minimist(process.argv.slice(2), { boolean: ['facets'] });
 	if (args._.length === 0) {
 		console.error(
 			'Usage: search [--page N] [--facets] [--filter <filters>] [--sort <sorting>] <query>',
@@ -23,10 +24,15 @@ async function main() {
 	const index = searchClient();
 	const response = await index.search(query, {
 		page,
+		showRankingScore: isVerbose(),
+		showRankingScoreDetails: isVerbose(),
 		...(filter && { filter }),
 		...(sort.length > 0 && { sort }),
 		...(facets && { facets: ['tags', 'type'] }),
 	});
+	if (isVerbose()) {
+		debug(response);
+	}
 
 	const hitCount =
 		response.totalHits ??
