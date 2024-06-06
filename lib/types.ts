@@ -85,7 +85,7 @@ export interface Post {
 	liked: boolean;
 	link_url?: string;
 	note_count: number;
-	parent_post_url: string;
+	parent_post_url?: string;
 	photos?: Photo[];
 	photoset_layout?: string;
 	post_url: string;
@@ -105,6 +105,11 @@ export interface Post {
 	title?: null | string;
 	trail: Trail[];
 	type: Type;
+}
+
+export interface IndexedPost extends Post {
+	images: string[];
+	is_reblog: boolean;
 }
 
 export interface PostBlog {

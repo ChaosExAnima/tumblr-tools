@@ -1,13 +1,12 @@
 #!/usr/bin/env -S pnpm tsx
-import type { Post } from '../lib/types';
+import type { IndexedPost } from '../lib/types';
 
 import { searchClient } from '../lib/search';
 
-type PostKeys = keyof Post;
+type PostKeys = keyof IndexedPost;
 
 async function main() {
-	const client = searchClient();
-	const index = client.index<Post>('tumblr');
+	const index = searchClient();
 	await Promise.allSettled([
 		index.updateFaceting({
 			sortFacetValuesBy: {
@@ -15,9 +14,16 @@ async function main() {
 			},
 		}),
 		index.updateFilterableAttributes([
+			'is_reblog',
 			'state',
 			'tags',
 			'type',
+			'timestamp',
+		] as PostKeys[]),
+		index.updateSortableAttributes([
+			'note_count',
+			'state',
+			'tags',
 			'timestamp',
 		] as PostKeys[]),
 		index.updateDisplayedAttributes([

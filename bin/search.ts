@@ -4,23 +4,30 @@ import 'dotenv/config';
 import minimist from 'minimist';
 
 import { searchClient } from '../lib/search';
-import { Post } from '../lib/types';
 
 async function main() {
 	const args = minimist(process.argv.slice(2));
 	if (args._.length === 0) {
-		console.error('Usage: search [--page N] [--no-facets] <query>');
+		console.error(
+			'Usage: search [--page N] [--facets] [--filter <filters>] [--sort <sorting>] <query>',
+		);
 		process.exit(1);
 	}
 
-	const client = searchClient();
-	const query = args._.join(' ');
+	const facets = args.facets === true;
 	const filter = args.filter;
 	const page = args.page ? parseInt(args.page, 10) : 1;
-	const noFacets = args.facets === false;
-	const response = await client
-		.index('tumblr')
-		.search<Post>(query, { facets: ['tags', 'type'], filter, page });
+	const query = args._.join(' ');
+	const sort = args.sort ? String(args.sort).split(',') : [];
+
+	const index = searchClient();
+	const response = await index.search(query, {
+		page,
+		...(filter && { filter }),
+		...(sort.length > 0 && { sort }),
+		...(facets && { facets: ['tags', 'type'] }),
+	});
+
 	const hitCount =
 		response.totalHits ??
 		`~${response.estimatedTotalHits}` ??
@@ -36,14 +43,15 @@ async function main() {
 			)
 			.join('\n'),
 	);
-	if (noFacets) {
-		return;
-	}
-	console.log();
-	for (const [facet, values] of Object.entries(response.facetDistribution)) {
-		console.log(`${facet}:`);
-		for (const [value, count] of Object.entries(values)) {
-			console.log(`\t${value}: ${count}`);
+	if (facets) {
+		console.log();
+		for (const [facet, values] of Object.entries(
+			response.facetDistribution,
+		)) {
+			console.log(`${facet}:`);
+			for (const [value, count] of Object.entries(values)) {
+				console.log(`\t${value}: ${count}`);
+			}
 		}
 	}
 }

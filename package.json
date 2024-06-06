@@ -7,7 +7,8 @@
     "docker:start": "docker compose up -d",
     "docker:stop": "docker compose down",
     "docker:logs": "docker compose logs -f",
-    "perms": "chmod +x bin/*.ts"
+    "perms": "chmod +x bin/*.ts",
+    "index": "tsx bin/index-updates.ts"
   },
   "keywords": [],
   "author": "",
