@@ -1,29 +1,26 @@
 #!/usr/bin/env -S pnpm tsx
 
 import 'dotenv/config';
-import MeiliSearch from 'meilisearch';
 import minimist from 'minimist';
 
+import { searchClient } from '../lib/search';
 import { Post } from '../lib/types';
 
 async function main() {
 	const args = minimist(process.argv.slice(2));
-	const client = new MeiliSearch({
-		apiKey: process.env.MEILISEARCH_KEY,
-		host: 'http://localhost:7700',
-	});
-
 	if (args._.length === 0) {
 		console.error('Usage: search [--page N] [--no-facets] <query>');
 		process.exit(1);
 	}
 
+	const client = searchClient();
 	const query = args._.join(' ');
+	const filter = args.filter;
 	const page = args.page ? parseInt(args.page, 10) : 1;
 	const noFacets = args.facets === false;
 	const response = await client
 		.index('tumblr')
-		.search<Post>(query, { facets: ['tags', 'type'], page });
+		.search<Post>(query, { facets: ['tags', 'type'], filter, page });
 	const hitCount =
 		response.totalHits ??
 		`~${response.estimatedTotalHits}` ??

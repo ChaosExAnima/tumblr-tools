@@ -15,6 +15,7 @@ async function main() {
 			},
 		}),
 		index.updateFilterableAttributes([
+			'state',
 			'tags',
 			'type',
 			'timestamp',
@@ -29,6 +30,7 @@ async function main() {
 			'post_url',
 			'state',
 			'summary',
+			'tags',
 			'timestamp',
 			'title',
 			'trail',
