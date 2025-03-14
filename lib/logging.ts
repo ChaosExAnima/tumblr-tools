@@ -3,7 +3,7 @@ import minimist from 'minimist';
 
 export function isVerbose() {
 	const args = minimist(process.argv.slice(2));
-	return !!args.verbose;
+	return !!(args.verbose || args.v);
 }
 
 export function debug(...args: unknown[]) {
